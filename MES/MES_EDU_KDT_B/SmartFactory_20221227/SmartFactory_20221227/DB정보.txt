@@ -1,0 +1,3 @@
+
+DB 정보
+DbPath = "Data Source=222.235.141.8; Initial Catalog=TEAM1; User ID= DB아이디 ; Password= 비밀번호 ";

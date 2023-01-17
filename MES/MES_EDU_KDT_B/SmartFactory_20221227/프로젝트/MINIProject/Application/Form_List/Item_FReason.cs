@@ -1,0 +1,219 @@
+﻿using Assamble;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
+using static System.Windows.Forms.AxHost;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
+
+namespace Form_List
+{
+    public partial class Item_FReason : BaseChildForm
+    {
+        public Item_FReason()
+        {
+            InitializeComponent();
+        }
+
+        private void Item_FReason_Load(object sender, EventArgs e)
+        {
+
+            cboFReason.Items.Add("ALL");
+            cboFReason.Items.Add("사람");
+            cboFReason.Items.Add("공정");
+            cboFReason.Items.Add("원자재");
+
+            DBHelper helper = new DBHelper();
+            DataTable dtTemp = new DataTable();
+            string sql = string.Empty;
+            sql += " select ''                              AS CODE_ID  ";
+            sql += "       ,'ALL'                           AS CODE_NAME";
+            sql += " UNION ALL                                          ";
+            sql += " select ITEMCODE                        AS CODE_ID  ";
+            sql += "       ,'[' + ITEMCODE + ']' + ITEMNAME AS CODE_NAME";
+            sql += " from TB_ItemMaster                                 ";
+            sql += " WHERE ITEMTYPE = 'FERT'                            ";
+
+            helper.SelectSql(sql, dtTemp);
+
+            cboItemCode.DataSource = dtTemp;
+            cboItemCode.ValueMember = "CODE_ID";    // 로직 상 처리될 코드가있는 컬럼.
+            cboItemCode.DisplayMember = "CODE_NAME";  // 사용자 에게 보여줄 컬럼.
+        }
+
+        public override void DoInquire()
+        {
+
+            //일자별 총 검사 품목 수 대비 불량 수량 을 보여주는 파이차트
+            string itemCode = cboItemCode.SelectedValue.ToString();
+            string sDate = ISP_SDate.Text;
+            string eDate = ISP_EDate.Text;
+            string fReason = cboFReason.Text;
+            if (fReason == "ALL") fReason = "";
+
+            DBHelper helper = new DBHelper();
+            helper.SetSelectSP("SP_ItemISPResult_PiChartData");
+            helper.SetSelectSP_Param("@ITEMCODE", itemCode);
+            helper.SetSelectSP_Param("@SDATE", sDate);
+            helper.SetSelectSP_Param("@EDATE", eDate);
+
+            DataTable dtTemp = new DataTable();
+            helper.SelectSP_Run(dtTemp);
+
+
+            if (dtTemp.Rows.Count == 0)
+            {
+                chart1.Series.Clear();
+                return;
+            }
+
+
+            int cntOK = 0;
+            int cntNG = 0;
+
+            foreach(DataRow dr in dtTemp.Rows)
+            {
+                if(dr["TRESULT"].ToString() == "OK")
+                {
+                    cntOK += Convert.ToInt32(dr["ITEMCNT"].ToString());
+                }
+                else
+                {
+                    cntNG += Convert.ToInt32(dr["ITEMCNT"].ToString());
+                }
+            }
+
+            chart1.Series.Clear();
+            Series series = new Series();
+            series.ChartType = SeriesChartType.Pie;
+
+            chart1.Series.Add(series);
+
+            chart1.Legends[0].Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            chart1.Series[0].Label = "#PERCENT{P1}";
+            string[] Legend = { "OK", "NG" };
+
+
+            if(cntOK == 0)
+            {
+                chart1.Series[0].Points.Add(cntNG);
+                chart1.Series[0].Points[0].LegendText = Legend[1];
+            }
+            else if(cntNG == 0)
+            {
+                chart1.Series[0].Points.Add(cntOK);
+                chart1.Series[0].Points[0].LegendText = Legend[0];
+            }
+            else
+            {
+
+                chart1.Series[0].Points.Add(cntOK);
+                chart1.Series[0].Points[0].LegendText = Legend[0];
+                chart1.Series[0].Points.Add(cntNG);
+                chart1.Series[0].Points[1].LegendText = Legend[1];
+            }
+        
+           
+          
+
+
+            //일자별 귀책사유를 보여주는 차트
+            helper.SetSelectSP("SP_ItemISPResult_ColumnhartData");
+            helper.SetSelectSP_Param("@ITEMCODE", itemCode);
+            helper.SetSelectSP_Param("@SDATE", sDate);
+            helper.SetSelectSP_Param("@EDATE", eDate);
+            helper.SetSelectSP_Param("@FREASON", fReason);
+
+            DataTable dtTemp2 = new DataTable();
+            helper.SelectSP_Run(dtTemp2);
+
+            chart2.Series.Clear();
+           // chart2.Legends.Clear(); // 범례
+
+           
+            //series.SetCustomProperty("PixelPointWidth", "30");
+
+            //series.SetCustomProperty("PointWidth", "0");
+
+
+
+            if (dtTemp2.Rows.Count == 0)
+            {
+                return;
+            }
+
+           
+
+            if (Convert.ToString(cboFReason.SelectedValue) == "")
+            {
+                #region < 다중 막대 차트 >
+                // ITEMNAME 별로 Series를 하나씩 자동으로 생성
+                // X축은 PRODDATE 컬럼, Y축은 PRODQTY 컬럼
+                // 각 그래프 상단에 ITEMNAME 으로 Label을 붙임
+                chart2.DataBindCrossTable(dtTemp2.AsEnumerable(), "FREASON", "DATE", "CNT", "");//"Label=ITEMNAME");
+                for (int i = 0; i < chart2.Series.Count; i++)
+                {
+                    chart2.Series[i].IsVisibleInLegend = true; //  범례 표시
+                    chart2.Series[i].LegendText = chart2.Series[i].ToString().Split('-')[1].ToString(); // 범례
+                    chart2.Series[i].SetCustomProperty("PixelPointWidth", "100");
+                    chart2.Series[i].SetCustomProperty("PointWidth", "0");
+                   //
+                   //chart2.Series[i].Label = chart2.Series[i].ToString().Split('-')[1].ToString();
+                    
+                    chart2.Series[i].IsValueShownAsLabel = true;  // 차트에 값 표시
+
+                }
+                #endregion
+            }
+            else
+            {
+                chart2.DataBindTable(dtTemp2.DefaultView, "DATE");
+                chart2.Series[0].Name = Convert.ToString(dtTemp2.Rows[0]["FREASON"]);
+                //chart2.Series[1].Name = Convert.ToString(dtTemp2.Rows[1]["FREASON"]);
+                //chart2.Series[2].Name = Convert.ToString(dtTemp2.Rows[2]["FREASON"]);
+            }
+
+
+
+        }
+
+    
+
+        private void DrawPieChart(Chart chart1, string title, int cntOK, int cntNG)
+        {
+    
+            chart1.Series.Clear();
+            chart1.Legends.Clear();
+
+            //Add a new Legend(if needed) and do some formating
+            chart1.Legends.Add("MyLegend");
+            chart1.Legends[0].LegendStyle = LegendStyle.Table;
+            chart1.Legends[0].Docking = Docking.Bottom;
+            chart1.Legends[0].Alignment = StringAlignment.Center;
+            chart1.Legends[0].Title = title;
+            chart1.Legends[0].BorderColor = Color.Black;
+
+            //Add a new chart-series
+            string seriesname = "MySeriesName";
+            chart1.Series.Add(seriesname);
+            //set the chart-type to "Pie"
+            chart1.Series[seriesname].ChartType = SeriesChartType.Pie;
+
+            //Add some datapoints so the series. in this case you can pass the values to this method
+            chart1.Series[seriesname].Points.AddXY(cntOK.ToString(), cntOK);
+            chart1.Series[seriesname].Points.AddXY(cntNG.ToString(), cntNG);
+            chart1.Series[seriesname].LegendText = "aaa";
+            MessageBox.Show(chart1.Series[seriesname].Points[0].ToString());
+
+            //chart1.Series[seriesname].Points.AddXY("MyPointName2", value3);
+            //chart1.Series[seriesname].Points.AddXY("MyPointName3", value4);
+            //chart1.Series[seriesname].Points.AddXY("MyPointName4", value5);
+        }
+    }
+}
