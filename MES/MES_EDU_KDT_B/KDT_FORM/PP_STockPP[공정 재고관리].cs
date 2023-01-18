@@ -106,7 +106,7 @@ namespace KDT_Form
                 string sLotNo      = Convert.ToString(txtLotNo.Text);
                 string sItemCode   = Convert.ToString(txtItemCode_H.Text);
 
-                rtnDtTemp = helper.FillTable("06PP_StockPP_S1", CommandType.StoredProcedure
+                rtnDtTemp = helper.FillTable("PP_StockPP_S1", CommandType.StoredProcedure
                                     , helper.CreateParameter("PLANTCODE",   sPlantCode )
                                     , helper.CreateParameter("ITEMTYPE",    sItemType  )
                                     , helper.CreateParameter("LOTNO",       sLotNo     )

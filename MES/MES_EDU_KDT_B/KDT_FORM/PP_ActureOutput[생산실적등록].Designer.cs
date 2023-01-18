@@ -368,6 +368,7 @@
             this.btnLOTIn.Size = new System.Drawing.Size(222, 37);
             this.btnLOTIn.TabIndex = 8;
             this.btnLOTIn.Text = "(4) LOT 투입";
+            this.btnLOTIn.Click += new System.EventHandler(this.btnLOTIn_Click);
             // 
             // txtINLotNo
             // 
