@@ -59,6 +59,7 @@
             this.txtWorkerName = new DC00_Component.STextBox(this.components);
             this.txtWORKER = new DC00_Component.SBtnTextEditor();
             this.sLabel5 = new DC00_Component.SLabel();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.gbxHeader)).BeginInit();
             this.gbxHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gbxBody)).BeginInit();
@@ -336,5 +337,6 @@
         private DC00_Component.STextBox txtWorkerName;
         private DC00_Component.SBtnTextEditor txtWORKER;
         private DC00_Component.SLabel sLabel5;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }

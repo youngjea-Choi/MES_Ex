@@ -662,6 +662,30 @@ namespace KDT_Form
                 DoInquire();
 
 
+                //제품 식별표에 출력 및 제품 LOT  별 데이터 조회
+                DataTable dtTemp = helper.FillTable("06PP_ActureOutput_S2", CommandType.StoredProcedure
+                                      , helper.CreateParameter("@PLANTCODE", sPLantCode)
+                                      , helper.CreateParameter("@LOTNO", helper.RSMSG)
+                                      );
+
+
+
+                Report_LotBacodeROH ROH = new Report_LotBacodeROH();
+
+            
+
+
+                Telerik.Reporting.ReportBook Book = new Telerik.Reporting.ReportBook();
+
+                Book.Reports.Add(ROH);
+
+                ReportViewer Viewer = new ReportViewer(Book, 1);
+                Viewer.ShowDialog();
+
+
+
+                DoInquire();
+
             }
             catch (Exception ex)
             {
@@ -713,6 +737,7 @@ namespace KDT_Form
                                         helper.CreateParameter("@WORKCENTERCODE", sWorkcenterCode),
                                         helper.CreateParameter("@ORDERNO", sOrderNo)
                                         );
+
 
 
                 if (helper.RSCODE != "S") throw new Exception(helper.RSMSG);

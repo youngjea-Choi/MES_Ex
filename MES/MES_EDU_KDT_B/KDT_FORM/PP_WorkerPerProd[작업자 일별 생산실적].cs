@@ -4,7 +4,7 @@
 //   Form Name    : 작업지시 별 생산 실적 현황
 //   Name Space   : KDT_Form
 //   Created Date : 2023-01-20
-//   Made By      : 이종원
+//   Made By      : 최영재
 //   Description  : 최초 프로그램 생성
 // *---------------------------------------------------------------------------------------------*
 #endregion
@@ -116,7 +116,7 @@ namespace KDT_Form
                 string sEndDate = string.Format(String.Format("{0:yyyy-MM-dd}", dtEndDate.Value));
 
                 DataTable dtTemp = new DataTable();
-                dtTemp = helper.FillTable("04PP_WorkerPerProd_S1", CommandType.StoredProcedure
+                dtTemp = helper.FillTable("06PP_WorkerPerProd_S1", CommandType.StoredProcedure
                                            , helper.CreateParameter("@PLANTCODE", sPlantCode)
                                            , helper.CreateParameter("@WORKER", sWorker)
                                            , helper.CreateParameter("@STARTDATE", sStartDate)
