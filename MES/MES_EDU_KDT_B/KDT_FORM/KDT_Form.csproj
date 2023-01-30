@@ -168,6 +168,12 @@
     <Compile Include="WM_ProdInStock[제품창고 입고].designer.cs">
       <DependentUpon>WM_ProdInStock[제품창고 입고].cs</DependentUpon>
     </Compile>
+    <Compile Include="WM_TradingManager[제품 출고 이력 및 거래명세서 발행].cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WM_TradingManager[제품 출고 이력 및 거래명세서 발행].designer.cs">
+      <DependentUpon>WM_TradingManager[제품 출고 이력 및 거래명세서 발행].cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="DC00_assm, Version=1.0.1.3, Culture=neutral, processorArchitecture=MSIL">
@@ -311,6 +317,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="WM_ProdInStock[제품창고 입고].resx">
       <DependentUpon>WM_ProdInStock[제품창고 입고].cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WM_TradingManager[제품 출고 이력 및 거래명세서 발행].resx">
+      <DependentUpon>WM_TradingManager[제품 출고 이력 및 거래명세서 발행].cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
